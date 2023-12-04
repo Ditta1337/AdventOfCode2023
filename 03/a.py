@@ -24,7 +24,9 @@ def find_numbers(data):
 
     return numbers_info
 
-
+# I could try to extend the area of number if possible
+# and the iterate over every row and column od such area to
+# check if there are any parts. Maybe I will change it someday.
 def check_surroundings(
     number_info, data, data_bounds
 ):  # data_bounds = (length, height)
