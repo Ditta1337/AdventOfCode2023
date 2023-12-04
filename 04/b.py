@@ -34,14 +34,14 @@ def find_matching(winning, my):
 
 def main():
     ret = 0
-    all_copies = {i:1 for i in range(len(data))}
+    all_copies = [1 for _ in range(len(data))]
     for card, line in enumerate(data):
         winning, my = parse_line(line)
         found_matches = find_matching(winning, my)
         for card_copy in range(card + 1, found_matches + card + 1):
             all_copies[card_copy] += all_copies[card]
 
-    for value in all_copies.values():
+    for value in all_copies:
         ret += value
     
     print(ret)
