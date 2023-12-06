@@ -26,73 +26,36 @@ def parse_data(data):
     return seed_ranges, maps
 
 
-def find_intersection(range1, range2):
-    a, b = range1
-    c, d = range2
-    if c <= a <= b <= d:
-        return [a, b]
-    elif a <= c <= d <= b:
-        return [c, d]
-    elif a <= c <= b <= d:
-        return [c, b]
-    elif c <= a <= d <= b:
-        return [a, d]
-    else:
-        return None
+def pass_through_maps(seed_ranges, maps):
+    for map in maps:
+        new_ranges = []
+        while seed_ranges:
+            r_start, r_stop = seed_ranges.pop()
+            for d, s, r in map:
+                o_start = max(r_start, s)
+                o_stop = min(r_stop, s + r)
+                if o_start < o_stop:
+                    new_ranges.append([o_start - s + d, o_stop - s + d])
+                    if o_start > r_start:
+                        seed_ranges.append([r_start, o_start])
+                    if o_stop < r_stop:
+                        seed_ranges.append([o_stop, r_stop])
+                    break
+            else:
+                new_ranges.append([r_start, r_stop])
+        seed_ranges = new_ranges
 
-
-def split_range(range1, range2):
-    a, b = range1
-    c, d = range2
-    result = []
-    if a <= c <= d <= b:
-        ranges = [[a, c], [c, d], [d, b]]
-    elif a <= c <= b <= d:
-        ranges = [[a, c], [c, b]]
-    elif c <= a <= d <= b:
-        ranges = [[a, d], [d, b]]
-    else:
-        ranges = [[a, b]]
-
-    for r in ranges:
-        if r[0] != r[1]:
-            result.append(r)
-
-    return result
-
-
-def pass_through_maps(seed_range, maps):
-    mapped_seed_ranges = [seed_range]
-    for m in maps:
-        for d, s, r in m:  # d - destination, s - source, r - range
-            new_seed_ranges = []
-            for range in mapped_seed_ranges:
-                mapped_seed_ranges.remove(range)
-                mapping_range = [s, s + r - 1]
-                new_seed_ranges.extend(split_range(range, mapping_range))
-                for new_seed_range in new_seed_ranges:
-                    if new_seed_range == find_intersection(
-                        new_seed_range, mapping_range
-                    ):
-                        new_seed_ranges.remove(new_seed_range)
-                        new_seed_ranges.append(
-                            [d + new_seed_range[0] - s, d + new_seed_range[1] - s]
-                        )
-            mapped_seed_ranges.extend(new_seed_ranges)
-
-    return mapped_seed_ranges
+    return seed_ranges
 
 
 def main():
     ret = 9**9
-    mapped_seeds = []
     seed_ranges, maps = parse_data(data)
 
-    for seed_range in seed_ranges:
-        mapped_seeds.extend(pass_through_maps(seed_range, maps))
+    mapped_seeds = pass_through_maps(seed_ranges, maps)
 
-    for seed_range in mapped_seeds:
-        ret = min(ret, seed_range[0])
+    for a, _ in mapped_seeds:
+        ret = min(ret, a)
 
     print(ret)
 
