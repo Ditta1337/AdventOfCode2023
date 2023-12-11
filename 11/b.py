@@ -1,6 +1,3 @@
-from collections import deque
-from scipy.special import comb
-
 with open("./11/input.txt") as f:
     data = f.readlines()
 
